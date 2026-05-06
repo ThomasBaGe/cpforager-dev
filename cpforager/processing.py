@@ -597,13 +597,13 @@ def add_dive(df, params):
 def add_filtered_acc(df, params):
     
     """    
-    Add to the dataframe the additional ``ax_f``, ``ay_f`` and ``az_f`` columns of the filtered triaxial accelerations. 
+    Add to the dataframe the additional ``ax_s``, ``ay_s``,  ``az_s``, ``ax_d``, ``ay_d`` and ``az_d`` columns of the static and the dynamic components triaxial accelerations. 
     
     :param df: dataframe with ``step_time``, ``ax``, ``ay`` and ``az`` columns.
     :type df: pandas.DataFrame
     :param params: parameters dictionary. 
     :type params: dict
-    :return: the dataframe with the additional ``ax_f``, ``ay_f`` and ``az_f`` columns of the filtered triaxial accelerations.
+    :return: the dataframe with the additional  ``ax_s``, ``ay_s``,  ``az_s``, ``ax_d``, ``ay_d`` and ``az_d``  columns of the static and the dynamic components of triaxial acceleration using a filter or a rolling window.
     :rtype: pandas.DataFrame
     
     Accelerations can be filtered using :
@@ -632,9 +632,16 @@ def add_filtered_acc(df, params):
         window = int(time_window/resolution)
         
         # compute filtered acceleration as the rolling average over a time window in seconds
-        df["ax_f"] = df["ax"] - df["ax"].rolling(window=window, center=True, min_periods=1).mean()
-        df["ay_f"] = df["ay"] - df["ay"].rolling(window=window, center=True, min_periods=1).mean()
-        df["az_f"] = df["az"] - df["az"].rolling(window=window, center=True, min_periods=1).mean()
+        #Dynamic acceleration
+        df["ax_d"] = df["ax"] - df["ax"].rolling(window=window, center=True, min_periods=1).mean()
+        df["ay_d"] = df["ay"] - df["ay"].rolling(window=window, center=True, min_periods=1).mean()
+        df["az_d"] = df["az"] - df["az"].rolling(window=window, center=True, min_periods=1).mean()
+        
+        #Static acceleration 
+        df["ax_s"] = df["ax"].rolling(window=window, center=True, min_periods=1).mean()
+        df["ay_s"] = df["ay"].rolling(window=window, center=True, min_periods=1).mean()
+        df["az_s"] = df["az"].rolling(window=window, center=True, min_periods=1).mean()
+        
         
     # Butterworth high-pass filtering 
     elif filter_type == "high_pass":
@@ -646,20 +653,29 @@ def add_filtered_acc(df, params):
         b, a = butter(order, normal_cutoff, btype="high", analog=False)
 
         # compute filtered acceleration by applying the filter
-        df["ax_f"] = filtfilt(b, a, df["ax"].values)
-        df["ay_f"] = filtfilt(b, a, df["ay"].values)
-        df["az_f"] = filtfilt(b, a, df["az"].values)
+        df["ax_d"] = filtfilt(b, a, df["ax"].values)
+        df["ay_d"] = filtfilt(b, a, df["ay"].values)
+        df["az_d"] = filtfilt(b, a, df["az"].values)
+        
+        df["ax_s"] = df["ax"] - filtfilt(b, a, df["ax"].values)
+        df["ay_s"] = df["ay"] - filtfilt(b, a, df["ay"].values)
+        df["az_s"] = df["az"] - filtfilt(b, a, df["az"].values)
     
     # raise error    
     else:
         raise NotImplementedError("Filter type %s is not implemented." % (filter_type))
         
     # reformat colum
-    df["ax_f"] = df["ax_f"].round(3)
-    df["ay_f"] = df["ay_f"].round(3)
-    df["az_f"] = df["az_f"].round(3) 
+    df["ax_d"] = df["ax_d"].round(3)
+    df["ay_d"] = df["ay_d"].round(3)
+    df["az_d"] = df["az_d"].round(3) 
+    
+    df["ax_s"] = df["ax_s"].round(3)
+    df["ay_s"] = df["ay_s"].round(3)
+    df["az_s"] = df["az_s"].round(3) 
     
     return(df)
+
 
 
 # ================================================================================================ #
@@ -670,7 +686,7 @@ def add_odba(df, params):
     """    
     Add to the dataframe the additional ``odba`` and ``odba_f`` columns of the raw and filtered overall dynamical body acceleration.
     
-    :param df: dataframe with ``ax``, ``ay``, ``az``, ``ax_f``, ``ay_f`` and ``az_f`` columns.
+    :param df: dataframe with ``ax``, ``ay``, ``az``, ``ax_d``, ``ay_d`` and ``az_d`` columns.
     :type df: pandas.DataFrame
     :param params: parameters dictionary. 
     :type params: dict
@@ -686,7 +702,7 @@ def add_odba(df, params):
     
     # compute odba as the euclidean p-norm of the acceleration vector
     df["odba"] = (abs(df["ax"])**p + abs(df["ay"])**p + abs(df["az"])**p)**(1/p)
-    df["odba_f"] = (abs(df["ax_f"])**p + abs(df["ay_f"])**p + abs(df["az_f"])**p)**(1/p)
+    df["odba_f"] = (abs(df["ax_d"])**p + abs(df["ay_d"])**p + abs(df["az_d"])**p)**(1/p)
     
     # reformat colum
     df["odba"] = df["odba"].round(3)
@@ -963,7 +979,7 @@ def add_axy_data(df, params):
 
     # rearrange full dataframe
     df = df[np.concatenate((["date", "time", "ax", "ay", "az", "longitude", "latitude", "pressure", "temperature",
-                             "datetime", "step_time", "is_night", "ax_f", "ay_f", "az_f", "odba", "odba_f"], gps_columns, tdr_columns))]
+                             "datetime", "step_time", "is_night", "ax_d", "ay_d", "az_d", "odba", "odba_f"], gps_columns, tdr_columns))]
         
     return(df, df_gps, df_tdr)
 
