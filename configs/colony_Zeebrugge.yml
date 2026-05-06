@@ -1,0 +1,9 @@
+# colony parameters
+colony:
+  name: Zeebrugge
+  center: [3.182, 51.341]
+  box_longitude: [3.167, 3.197]
+  box_latitude: [51.332, 51.350]
+  
+# local timezone
+local_tz : Europe/Paris

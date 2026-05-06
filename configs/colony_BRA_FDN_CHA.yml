@@ -1,0 +1,9 @@
+# colony parameters
+colony:
+  name: BRA_FDN_CHA
+  center: [-32.42150, -3.87075]
+  box_longitude: [-32.4230, -32.4200]
+  box_latitude: [-3.8720, -3.8695]
+  
+# local timezone
+local_tz : America/Noronha

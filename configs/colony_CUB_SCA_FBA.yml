@@ -1,0 +1,9 @@
+# colony parameters
+colony:
+  name: CUB_SCA_FBA
+  center: [-78.62310, 22.61165]
+  box_longitude: [-78.6253, -78.6209]
+  box_latitude: [22.6098, 22.6135]
+  
+# local timezone
+local_tz : Cuba

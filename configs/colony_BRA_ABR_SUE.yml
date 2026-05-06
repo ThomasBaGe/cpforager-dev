@@ -1,0 +1,9 @@
+# colony parameters
+colony:
+  name: BRA_ABR_SUE
+  center: [-38.69880, -17.98060]
+  box_longitude: [-38.7016, -38.6960]
+  box_latitude: [-17.9822, -17.9790]
+  
+# local timezone
+local_tz : America/Bahia

@@ -1,0 +1,9 @@
+# colony parameters
+colony:
+  name: BRA_SPS_BEL
+  center: [-29.34570, 0.91670]
+  box_longitude: [-29.3462, -29.3452]
+  box_latitude: [0.9160, 0.9174]
+  
+# local timezone
+local_tz : America/Noronha

@@ -1,0 +1,9 @@
+# colony parameters
+colony:
+  name: Vlissingen
+  center: [3.689, 51.450]
+  box_longitude: [3.674, 3.704]
+  box_latitude: [51.441, 51.459]
+  
+# local timezone
+local_tz : Europe/Paris

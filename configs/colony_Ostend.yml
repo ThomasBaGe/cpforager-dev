@@ -1,0 +1,9 @@
+# colony parameters
+colony:
+  name: Ostend
+  center: [2.931, 51.233]
+  box_longitude: [2.916, 2.946]
+  box_latitude: [51.224, 51.242]
+  
+# local timezone
+local_tz : Europe/Paris
