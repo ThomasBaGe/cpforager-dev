@@ -46,7 +46,7 @@ def full_diagnostic(self, fig_dir, file_id, plot_params, fast=False):
     frequency = self.frequency
     total_duration = self.total_duration
     median_odba = self.median_odba
-    median_odba_f = self.median_odba_f
+    #ajouter vedba
     df_tdr = self.df_tdr
     df_gps = self.df_gps
     n_df_gps = self.gps.n_df
@@ -93,7 +93,7 @@ def full_diagnostic(self, fig_dir, file_id, plot_params, fast=False):
         infos.append("Largest trip = %.1f km" % trip_length.max())
         infos.append("Median trip length = %.1f km" % trip_length.quantile(0.5))
     infos.append("Median odba = %.3f" % median_odba)
-    infos.append("Median odba_f = %.3f" % median_odba_f)
+    #ajouter vedba
     infos.append("Number of dives = %d" % n_dives)
     infos.append("Median pressure = %.1f hPa" % median_pressure)
     infos.append("Median depth = %.2f m" % median_depth)

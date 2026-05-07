@@ -60,11 +60,7 @@ class AXY:
         :ivar max_odba: the maximum overall dynamical body acceleration.
         :vartype max_odba: float
         :ivar median_odba: the median overall dynamical body acceleration.
-        :vartype median_odba: float
-        :ivar max_odba_f: the maximum filtered overall dynamical body acceleration.
-        :vartype max_odba_f: float
-        :ivar median_odba_f: the median filtered overall dynamical body acceleration.
-        :vartype median_odba_f: float        
+        :vartype median_odba: float       
         """
 
         # process data
@@ -92,8 +88,6 @@ class AXY:
         self.total_duration = basic_infos["total_duration"]
         self.max_odba = axy_infos["max_odba"]
         self.median_odba = axy_infos["median_odba"]
-        self.max_odba_f = axy_infos["max_odba_f"]
-        self.median_odba_f = axy_infos["median_odba_f"]
         self.gps = gps
         self.df_gps = df_gps
         self.tdr = tdr

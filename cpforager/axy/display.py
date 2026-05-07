@@ -36,6 +36,6 @@ def display_data_summary(self, standalone=True):
     print("# + Median (ax, ay, az)       = (%.3f, %.3f, %.3f)" % (self.df["ax"].median(), self.df["ay"].median(), self.df["az"].median()))
     print("# + Median (ax_d, ay_d, az_d) = (%.3f, %.3f, %.3f)" % (self.df["ax_d"].median(), self.df["ay_d"].median(), self.df["az_d"].median()))
     print("# + Median odba               = %.3f" % self.median_odba)
-    print("# + Median odba_f             = %.3f" % self.median_odba_f)
+    # ajouter vedba
     if standalone:
         print("# ===================================================================== #")

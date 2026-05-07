@@ -681,16 +681,17 @@ def add_filtered_acc(df, params):
 # ================================================================================================ #
 # ODBA
 # ================================================================================================ #
+
 def add_odba(df, params): 
         
     """    
-    Add to the dataframe the additional ``odba`` and ``odba_f`` columns of the raw and filtered overall dynamical body acceleration.
+    Add to the dataframe the additional ``odba`` column (overall dynamical body acceleration).
     
-    :param df: dataframe with ``ax``, ``ay``, ``az``, ``ax_d``, ``ay_d`` and ``az_d`` columns.
+    :param df: dataframe with ``ax_d``, ``ay_d`` and ``az_d`` columns.
     :type df: pandas.DataFrame
     :param params: parameters dictionary. 
     :type params: dict
-    :return: the dataframe with the additional ``odba`` and ``odba_f`` columns of the raw and filtered overall dynamical body acceleration.
+    :return: the dataframe with the additional ``odba`` column (overall dynamical body acceleration)
     :rtype: pandas.DataFrame
     
     .. note::
@@ -701,14 +702,10 @@ def add_odba(df, params):
     p = params.get("odba_p_norm")
     
     # compute odba as the euclidean p-norm of the acceleration vector
-    df["odba"] = (abs(df["ax"])**p + abs(df["ay"])**p + abs(df["az"])**p)**(1/p)
-    df["odba_f"] = (abs(df["ax_d"])**p + abs(df["ay_d"])**p + abs(df["az_d"])**p)**(1/p)
+    df["odba"] = (abs(df["ax_d"])**p + abs(df["ay_d"])**p + abs(df["az_d"])**p)**(1/p)
     
     # reformat colum
     df["odba"] = df["odba"].round(3)
-    df["odba_f"] = df["odba_f"].round(3)
-
-    return(df)
 
 
 # ================================================================================================ #
@@ -961,13 +958,16 @@ def add_axy_data(df, params):
     df.loc[tdr_indices, tdr_columns] = df_tdr_tmp[tdr_columns].values
     
     # produce df_gps by processing (sum, mean, max) data between two gps measures
-    funcs_cols = {"sum":["odba", "odba_f", "step_time"], "max":["pressure", "depth", "dive"], "mean":["temperature"], "len_unique_pos":["dive"]}
-    df = utils.apply_functions_between_samples(df, gps_resolution, funcs_cols, verbose=True)
-    
+    cols_funcs = {"odba":"sum", "step_time":"sum",
+                  "pressure":"max", "depth":"max", "dive":"max",
+                  "temperature":"mean",
+                  "dive":"len_unique_pos"}
+    df = utils.apply_functions_between_samples(df, gps_resolution, cols_funcs, verbose=True)
+
     # process gps data
     df_gps = df.loc[gps_resolution].reset_index(drop=True)
-    df_gps = df_gps.drop(["odba", "odba_f", "step_time", "dive", "pressure", "depth", "temperature"], axis=1)
-    df_gps = df_gps.rename(columns={"odba_sum":"odba", "odba_f_sum":"odba_f", "step_time_sum":"step_time", 
+    df_gps = df_gps.drop(["odba", "step_time", "dive", "pressure", "depth", "temperature"], axis=1)
+    df_gps = df_gps.rename(columns={"odba_sum":"odba", "step_time_sum":"step_time", 
                                     "dive_max":"dive", "dive_len_unique_pos":"n_dives",
                                     "pressure_max":"pressure", "depth_max":"depth", "temperature_mean":"temperature"})
     df_gps["trip"] = df_gps["trip"].astype(int)
@@ -979,7 +979,7 @@ def add_axy_data(df, params):
 
     # rearrange full dataframe
     df = df[np.concatenate((["date", "time", "ax", "ay", "az", "longitude", "latitude", "pressure", "temperature",
-                             "datetime", "step_time", "is_night", "ax_d", "ay_d", "az_d", "odba", "odba_f"], gps_columns, tdr_columns))]
+                             "datetime", "step_time", "is_night", "ax_d", "ay_d", "az_d", "ax_s", "ay_s", "az_s", "odba"], gps_columns, tdr_columns))]
         
     return(df, df_gps, df_tdr)
 
@@ -1187,13 +1187,9 @@ def compute_axy_infos(df):
     # compute axy infos
     max_odba = df["odba"].max()
     median_odba = df["odba"].median()
-    max_odba_f = df["odba_f"].max()
-    median_odba_f = df["odba_f"].median()
             
     # store axy infos
     infos = {"max_odba" : max_odba,
-             "median_odba" : median_odba, 
-             "max_odba_f" : max_odba_f, 
-             "median_odba_f" : median_odba_f}
+             "median_odba" : median_odba}
     
     return(infos)
