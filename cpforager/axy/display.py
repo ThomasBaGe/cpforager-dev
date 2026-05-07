@@ -34,6 +34,7 @@ def display_data_summary(self, standalone=True):
     print("# + Date range                = %s | %s" % (self.start_datetime, self.end_datetime))     
     print("# + Frequency                 = %.1f Hz" % self.frequency)
     print("# + Median (ax, ay, az)       = (%.3f, %.3f, %.3f)" % (self.df["ax"].median(), self.df["ay"].median(), self.df["az"].median()))
+    print("# + Median (ax_s, ay_s, az_s) = (%.3f, %.3f, %.3f)" % (self.df["ax_s"].median(), self.df["ay_s"].median(), self.df["az_s"].median()))
     print("# + Median (ax_d, ay_d, az_d) = (%.3f, %.3f, %.3f)" % (self.df["ax_d"].median(), self.df["ay_d"].median(), self.df["az_d"].median()))
     print("# + Median odba               = %.3f" % self.median_odba)
     # ajouter vedba
