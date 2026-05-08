@@ -961,6 +961,8 @@ def add_axy_data(df, params):
     df = add_filtered_acc(df, params)
     df = add_odba(df, params)
     df = add_vedba(df, params)
+    df = add_pitch(df)
+    df = add_roll(df)
         
     # extract data at gps resolution and add processed gps data
     gps_resolution = (df["longitude"].notna()) & (df["latitude"].notna())
@@ -989,16 +991,20 @@ def add_axy_data(df, params):
     df.loc[tdr_indices, tdr_columns] = df_tdr_tmp[tdr_columns].values
     
     # produce df_gps by processing (sum, mean, max) data between two gps measures
-    cols_funcs = {"odba":"sum", "vedba": "sum", "step_time":"sum",
-                  "pressure":"max", "depth":"max", "dive":"max",
-                  "temperature":"mean",
-                  "dive":"len_unique_pos"}
+    cols_funcs = {"odba":"sum", "vedba":"sum", 
+                  "pitch": "circ_mean", "pitch": "circ_sd", 
+                  "roll": "circ_mean", "roll": "circ_sd",
+                  "step_time":"sum", "pressure":"max", "depth":"max",
+                  "dive":"max", "temperature":"mean", "dive":"len_unique_pos"}
     df = utils.apply_functions_between_samples(df, gps_resolution, cols_funcs, verbose=True)
 
     # process gps data
     df_gps = df.loc[gps_resolution].reset_index(drop=True)
-    df_gps = df_gps.drop(["odba", "vedba", "step_time", "dive", "pressure", "depth", "temperature"], axis=1)
-    df_gps = df_gps.rename(columns={"odba_sum":"odba", "vedba_sum":"vedba", "step_time_sum":"step_time", 
+    df_gps = df_gps.drop(["odba", "vedba", "pitch", "roll", "step_time", "dive", "pressure", "depth", "temperature"], axis=1)
+    df_gps = df_gps.rename(columns={"odba_sum":"odba", "vedba_sum":"odba",
+                                    "pitch_circ_mean": "pitch_mean", "pitch_circ_sd": "pitch_sd", 
+                                    "roll_circ_mean": "roll_mean", "roll_circ_sd": "roll_sd",
+                                    "step_time_sum":"step_time", 
                                     "dive_max":"dive", "dive_len_unique_pos":"n_dives",
                                     "pressure_max":"pressure", "depth_max":"depth", "temperature_mean":"temperature"})
     df_gps["trip"] = df_gps["trip"].astype(int)
@@ -1009,8 +1015,10 @@ def add_axy_data(df, params):
     df_tdr["dive"] = df_tdr["dive"].astype(int)
 
     # rearrange full dataframe
-    df = df[np.concatenate((["date", "time", "ax", "ay", "az", "longitude", "latitude", "pressure", "temperature",
-                             "datetime", "step_time", "is_night", "ax_d", "ay_d", "az_d", "ax_s", "ay_s", "az_s", "odba", "vedba"], gps_columns, tdr_columns))]
+    df = df[np.concatenate((["date", "time", "ax", "ay", "az", "longitude", "latitude", 
+                             "pressure", "temperature","datetime", "step_time", "is_night", 
+                             "ax_s", "ay_s", "az_s", "ax_d", "ay_d", "az_d",
+                             "odba", "vedba", "pitch_mean", "pitch_sd", "roll_mean", "roll_sd" ], gps_columns, tdr_columns))]
         
     return(df, df_gps, df_tdr)
 

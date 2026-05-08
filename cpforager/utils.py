@@ -96,7 +96,6 @@ def spherical_heading(lon_1, lat_1, lon_2, lat_2):
 # ================================================================================================ #
 # CIRCULAR MEAN AND SD
 # ================================================================================================ #
-
 def circular_mean(angles):
     """
     Compute circular mean (for pitch or roll) for each interval.
