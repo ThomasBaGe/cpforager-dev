@@ -5,6 +5,7 @@ import math
 import numpy as np
 import pandas as pd
 from cpforager import misc
+import scipy.stats as scipy
 
 
 # ================================================================================================ #
@@ -92,6 +93,37 @@ def spherical_heading(lon_1, lat_1, lon_2, lat_2):
 
     return(heading_deg)
 
+# ================================================================================================ #
+# CIRCULAR MEAN AND SD
+# ================================================================================================ #
+
+def circular_mean(angles):
+    """
+    Compute circular mean (for pitch or roll) for each interval.
+    
+    :param angles: angles in degrees for which we want to compute the mean.
+    :type angles: list
+    :return: the circular mean in degrees.
+    :rtype: float
+    """
+    angles_rad = np.pi/180*angles
+    average_angle_rad = scipy.circmean(angles_rad, low=-np.pi, high=np.pi)
+    average_angle = 180/np.pi*average_angle_rad
+    return(average_angle)
+
+def circular_sd(angles):
+    """
+    Compute circular standard deviation (for pitch or roll) for each interval.
+    
+    :param angles: angles in degrees for which we want to compute the standard deviation.
+    :type angles: list
+    :return: the circular standard deviation in degrees.
+    :rtype: float
+    """
+    angles_rad = np.pi/180*angles
+    average_angle_rad = scipy.circstd(angles_rad, low=-np.pi, high=np.pi)
+    average_angle = 180/np.pi*average_angle_rad
+    return(average_angle)
 
 # ================================================================================================ #
 # UTC TO LOC
