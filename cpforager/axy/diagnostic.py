@@ -46,7 +46,7 @@ def full_diagnostic(self, fig_dir, file_id, plot_params, fast=False):
     frequency = self.frequency
     total_duration = self.total_duration
     median_odba = self.median_odba
-    #ajouter vedba
+    median_vedba = self.median_vedba
     df_tdr = self.df_tdr
     df_gps = self.df_gps
     n_df_gps = self.gps.n_df
@@ -93,7 +93,7 @@ def full_diagnostic(self, fig_dir, file_id, plot_params, fast=False):
         infos.append("Largest trip = %.1f km" % trip_length.max())
         infos.append("Median trip length = %.1f km" % trip_length.quantile(0.5))
     infos.append("Median odba = %.3f" % median_odba)
-    #ajouter vedba
+    infos.append("Median vedba = %.3f" % median_vedba)
     infos.append("Number of dives = %d" % n_dives)
     infos.append("Median pressure = %.1f hPa" % median_pressure)
     infos.append("Median depth = %.2f m" % median_depth)
@@ -216,6 +216,7 @@ def full_diagnostic(self, fig_dir, file_id, plot_params, fast=False):
     # odba timeserie zoom (50% to 50.1% dataframe length)
     ax = fig.add_subplot(gs[4,4])
     diagnostic.plot_ts_twinx(ax, df.iloc[int(0.5*n_df):int((0.5+0.001)*n_df)].reset_index(drop=True), params, plot_params, "odba", "Overall Dynamic Body Acceleration [Zoom]", "ODBA [g]", scatter=False)
+    
     
     # pressure
     ax = fig.add_subplot(gs[5,0])

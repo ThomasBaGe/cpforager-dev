@@ -681,7 +681,6 @@ def add_filtered_acc(df, params):
 # ================================================================================================ #
 # ODBA
 # ================================================================================================ #
-
 def add_odba(df, params): 
         
     """    
@@ -706,6 +705,37 @@ def add_odba(df, params):
     
     # reformat colum
     df["odba"] = df["odba"].round(3)
+    
+    
+# ================================================================================================ #
+# VeDBA
+# ================================================================================================ #
+def add_vedba(df, params): 
+        
+    """    
+    Add to the dataframe the additional ``vedba``  column of the vectorial dynamical body acceleration.
+    
+    :param df: dataframe with ``ax``, ``ay``, ``az``, ``ax_d``, ``ay_d`` and ``az_d`` columns.
+    :type df: pandas.DataFrame
+    :param params: parameters dictionary. 
+    :type params: dict
+    :return: the dataframe with the additional ``vedba``  column of the raw vectorial sum of acceleration, vectoral dynamical body acceleratio from filtered data and form dynamic accelartion after substarction of the static component.
+    :rtype: pandas.DataFrame
+    
+    .. note::
+        The required fields in the parameters dictionary are ``vedba_p_norm``.
+    """
+    
+    # get parameters
+    p = params.get("vedba_p_norm")
+    
+    # compute vedba as the euclidean p-norm of the acceleration vector
+    df["vedba"] = (abs(df["ax"])**p + abs(df["ay"])**p + abs(df["az"])**p)**(1/p)
+    
+    # reformat colum
+    df["vedba"] = df["vedba"].round(3)
+
+    return(df)
 
 
 # ================================================================================================ #
@@ -930,6 +960,7 @@ def add_axy_data(df, params):
     # process acceleration data
     df = add_filtered_acc(df, params)
     df = add_odba(df, params)
+    df = add_vedba(df, params)
         
     # extract data at gps resolution and add processed gps data
     gps_resolution = (df["longitude"].notna()) & (df["latitude"].notna())
@@ -958,7 +989,7 @@ def add_axy_data(df, params):
     df.loc[tdr_indices, tdr_columns] = df_tdr_tmp[tdr_columns].values
     
     # produce df_gps by processing (sum, mean, max) data between two gps measures
-    cols_funcs = {"odba":"sum", "step_time":"sum",
+    cols_funcs = {"odba":"sum", "vedba": "sum", "step_time":"sum",
                   "pressure":"max", "depth":"max", "dive":"max",
                   "temperature":"mean",
                   "dive":"len_unique_pos"}
@@ -966,8 +997,8 @@ def add_axy_data(df, params):
 
     # process gps data
     df_gps = df.loc[gps_resolution].reset_index(drop=True)
-    df_gps = df_gps.drop(["odba", "step_time", "dive", "pressure", "depth", "temperature"], axis=1)
-    df_gps = df_gps.rename(columns={"odba_sum":"odba", "step_time_sum":"step_time", 
+    df_gps = df_gps.drop(["odba", "vedba", "step_time", "dive", "pressure", "depth", "temperature"], axis=1)
+    df_gps = df_gps.rename(columns={"odba_sum":"odba", "vedba_sum":"vedba", "step_time_sum":"step_time", 
                                     "dive_max":"dive", "dive_len_unique_pos":"n_dives",
                                     "pressure_max":"pressure", "depth_max":"depth", "temperature_mean":"temperature"})
     df_gps["trip"] = df_gps["trip"].astype(int)
@@ -979,7 +1010,7 @@ def add_axy_data(df, params):
 
     # rearrange full dataframe
     df = df[np.concatenate((["date", "time", "ax", "ay", "az", "longitude", "latitude", "pressure", "temperature",
-                             "datetime", "step_time", "is_night", "ax_d", "ay_d", "az_d", "ax_s", "ay_s", "az_s", "odba"], gps_columns, tdr_columns))]
+                             "datetime", "step_time", "is_night", "ax_d", "ay_d", "az_d", "ax_s", "ay_s", "az_s", "odba", "vedba"], gps_columns, tdr_columns))]
         
     return(df, df_gps, df_tdr)
 
@@ -1187,9 +1218,13 @@ def compute_axy_infos(df):
     # compute axy infos
     max_odba = df["odba"].max()
     median_odba = df["odba"].median()
+    max_vedba = df["vedba"].max()
+    median_vedba = df["vedba"].median()
             
     # store axy infos
     infos = {"max_odba" : max_odba,
-             "median_odba" : median_odba}
+             "median_odba" : median_odba,
+             "max_vedba": max_vedba,
+             "median_vedba": median_vedba}
     
     return(infos)
