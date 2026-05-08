@@ -209,11 +209,13 @@ def apply_functions_between_samples(df, resolution, functions_columns, verbose=F
         ``mean``, "compute the mean of every elements bewteen two subsamples"
         ``min``, "keep the minimum value of every elements bewteen two subsamples"
         ``max``, "keep the maximum value of every elements bewteen two subsamples"
+        ``circ_mean``, "compute the circular mean for circular data like angles"
+        ``circ_sd``, "compute the circular mean for circular data like angles"
         ``len_unique_pos``, "compute the number of different positive values of every elements bewteen two subsamples"
     """
     
     # set of possible values for funcs
-    funcs_possible_values = ["sum", "mean", "min", "max", "len_unique_pos"]
+    funcs_possible_values = ["sum", "mean", "min", "max", "len_unique_pos", "circ_mean", "circ_sd"]
         
     # set subsampled dataframe at subsampling resolution
     df_subsamples = df.loc[resolution].reset_index(drop=True)
@@ -247,6 +249,7 @@ def apply_functions_between_samples(df, resolution, functions_columns, verbose=F
             
             # loop over columns to be processed (sum, mean, min or max) between samples
             if len(between_subsamples_points) > 0:
+
                 for f, cs in functions_columns.items():
                     for c in cs:
                         new_column = "%s_%s" % (c, f)
@@ -255,8 +258,10 @@ def apply_functions_between_samples(df, resolution, functions_columns, verbose=F
                         elif f=="min": df.loc[idx_1-1,new_column] = df.loc[between_subsamples_points,c].min()
                         elif f=="max": df.loc[idx_1-1,new_column] = df.loc[between_subsamples_points,c].max()
                         elif f=="len_unique_pos": df.loc[idx_1-1,new_column] = (df.loc[between_subsamples_points,c].unique()>0).sum()
+                        elif f=="circ_mean": df.loc[idx_1-1,new_column] = circular_mean(df.loc[between_subsamples_points,c])
+                        elif f=="circ_sd": df.loc[idx_1-1,new_column] = circular_sd(df.loc[between_subsamples_points,c])
                         else: print("WARNING : \"%s\" cannot be found within the array of possible values, i.e. %s" %(f, funcs_possible_values))
-                    
+               
     # if subsampling resolution is thiner than sampling resolution
     else:
         for f, cs in functions_columns.items():
