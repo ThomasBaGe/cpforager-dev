@@ -7,8 +7,7 @@ from cpforager import parameters, utils, AXY
 # =============================================================================
 
 # config stuff 
-# root_dir = os.getcwd()
-root_dir = 'C:/Users/tbarbede/Documents/Thèse/Research/code/cpforager-dev'
+root_dir = os.getcwd()
 data_dir = os.path.join(root_dir, "data", "lv0")
 config_dir = os.path.join(root_dir, "configs")
 
@@ -35,8 +34,8 @@ colonies = ['BRA_ABR_SBA']
 fieldworks = ['BRA_ABR_2021_09']
 
 # set interpolation frequency
-interp_freq_secs = [1,5,10,30,60]
-
+interp_freq_secs = [5,10,30,60]
+# interp_freq_secs = [60]
 
 for interp in interp_freq_secs:
     print(interp)
@@ -91,6 +90,7 @@ for interp in interp_freq_secs:
             axy = AXY(df=df, group=fieldwork, id=file_id, params=params)
             
             # save df with axy at gps resolution (level 1)
+            #axy.df_gps.to_csv(os.path.join(lv1_fw_dir, file_name), index=False)
             axy.df_gps.to_csv(os.path.join(lv1_fw_dir, file_name), index=False)
             
             #interpolate axy
@@ -103,7 +103,10 @@ for interp in interp_freq_secs:
             axy_interp = AXY(df=df_interp, group=fieldwork, id="%s_%s" % (axy.id, "interp"), params=params)
             
             # save df with axy at interpolated gps resolution (level 2)
-            axy_interp.df_gps.to_csv(os.path.join(lv2_fw_dir, file_name), index=False)
+            
+            #Add GPS resolution
+            #axy_interp.df_gps.to_csv(os.path.join(lv2_fw_dir, file_name), index=False)
+            axy_interp.df_gps.to_csv(os.path.join(lv2_fw_dir, "%s_%s%s" % (file_id,interp,"s.csv")), index=False)
         
         print('\n------------------------------------------------------------\n')
     
