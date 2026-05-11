@@ -706,6 +706,8 @@ def add_odba(df, params):
     # reformat colum
     df["odba"] = df["odba"].round(3)
     
+    return(df)
+    
     
 # ================================================================================================ #
 # VeDBA
@@ -730,7 +732,7 @@ def add_vedba(df, params):
     p = params.get("vedba_p_norm")
     
     # compute vedba as the euclidean p-norm of the acceleration vector
-    df["vedba"] = (abs(df["ax"])**p + abs(df["ay"])**p + abs(df["az"])**p)**(1/p)
+    df["vedba"] = (abs(df["ax_d"])**p + abs(df["ay_d"])**p + abs(df["az_d"])**p)**(1/p)
     
     # reformat colum
     df["vedba"] = df["vedba"].round(3)
@@ -991,17 +993,16 @@ def add_axy_data(df, params):
     df.loc[tdr_indices, tdr_columns] = df_tdr_tmp[tdr_columns].values
     
     # produce df_gps by processing (sum, mean, max) data between two gps measures
-    cols_funcs = {"odba":"sum", "vedba":"sum", 
-                  "pitch": "circ_mean", "pitch": "circ_sd", 
-                  "roll": "circ_mean", "roll": "circ_sd",
-                  "step_time":"sum", "pressure":"max", "depth":"max",
-                  "dive":"max", "temperature":"mean", "dive":"len_unique_pos"}
+    cols_funcs = {"odba":"sum", "vedba":"sum", "pitch": "circ_mean", "roll": "circ_mean"}
+    df = utils.apply_functions_between_samples(df, gps_resolution, cols_funcs, verbose=True)
+
+    cols_funcs = {"pitch": "circ_sd", "roll": "circ_sd", "step_time":"sum", "pressure":"max", "depth":"max", "dive":"max"}
     df = utils.apply_functions_between_samples(df, gps_resolution, cols_funcs, verbose=True)
 
     # process gps data
     df_gps = df.loc[gps_resolution].reset_index(drop=True)
     df_gps = df_gps.drop(["odba", "vedba", "pitch", "roll", "step_time", "dive", "pressure", "depth", "temperature"], axis=1)
-    df_gps = df_gps.rename(columns={"odba_sum":"odba", "vedba_sum":"odba",
+    df_gps = df_gps.rename(columns={"odba_sum":"odba", "vedba_sum":"vedba",
                                     "pitch_circ_mean": "pitch_mean", "pitch_circ_sd": "pitch_sd", 
                                     "roll_circ_mean": "roll_mean", "roll_circ_sd": "roll_sd",
                                     "step_time_sum":"step_time", 
@@ -1018,7 +1019,7 @@ def add_axy_data(df, params):
     df = df[np.concatenate((["date", "time", "ax", "ay", "az", "longitude", "latitude", 
                              "pressure", "temperature","datetime", "step_time", "is_night", 
                              "ax_s", "ay_s", "az_s", "ax_d", "ay_d", "az_d",
-                             "odba", "vedba", "pitch_mean", "pitch_sd", "roll_mean", "roll_sd" ], gps_columns, tdr_columns))]
+                             "odba", "vedba", "pitch", "roll"], gps_columns, tdr_columns))]
         
     return(df, df_gps, df_tdr)
 
