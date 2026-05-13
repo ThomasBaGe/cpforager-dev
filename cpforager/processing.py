@@ -739,6 +739,42 @@ def add_vedba(df, params):
 
     return(df)
 
+# ================================================================================================ #
+# Pitch
+# ================================================================================================ #
+def add_pitch(df):
+    
+    """    
+    Add to the dataframe pitch
+    
+    :param df: dataframe with ``ax_s``, ``ay_s`` and ``az_s`` columns.
+    :type df: pandas.DataFrame
+    :return: the dataframe with pitch
+    :rtype: pandas.DataFrame
+    """
+    
+    df['pitch'] = (180/np.pi)*np.arctan(df['ax_s']/np.sqrt(df['ay_s']**2+df['az_s']**2))
+    
+    return(df)
+
+
+# ================================================================================================ #
+# Roll
+# ================================================================================================ #
+def add_roll(df):
+    
+    """    
+    Add to the dataframe roll
+    
+    :param df: dataframe with ``ax_s``, ``ay_s`` and ``az_s`` columns.
+    :type df: pandas.DataFrame
+    :return: the dataframe with roll
+    :rtype: pandas.DataFrame
+    """
+    
+    
+    df['roll'] = (180/np.pi)*np.arctan(df['ay_s']/np.sqrt(df['ax_s']**2+df['az_s']**2))
+    return(df)
 
 # ================================================================================================ #
 # TAG SUSPICIOUS ROWS
@@ -993,11 +1029,8 @@ def add_axy_data(df, params):
     df.loc[tdr_indices, tdr_columns] = df_tdr_tmp[tdr_columns].values
     
     # produce df_gps by processing (sum, mean, max) data between two gps measures
-    cols_funcs = {"odba":"sum", "vedba":"sum", "pitch": "circ_mean", "roll": "circ_mean"}
-    df = utils.apply_functions_between_samples(df, gps_resolution, cols_funcs, verbose=True)
-
-    cols_funcs = {"pitch": "circ_sd", "roll": "circ_sd", "step_time":"sum", "pressure":"max", "depth":"max", "dive":"max"}
-    df = utils.apply_functions_between_samples(df, gps_resolution, cols_funcs, verbose=True)
+    funcs_cols = {"sum":["odba", "odba_f", "step_time"], "max":["pressure", "depth", "dive"], "mean":["temperature"], "len_unique_pos":["dive"], "circ_mean":["pitch","roll"], "circ_sd":["pitch","roll"]}
+    df = utils.apply_functions_between_samples(df, gps_resolution, funcs_cols, verbose=True)
 
     # process gps data
     df_gps = df.loc[gps_resolution].reset_index(drop=True)
