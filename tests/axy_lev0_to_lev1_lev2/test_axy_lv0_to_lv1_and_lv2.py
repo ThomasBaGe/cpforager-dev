@@ -1,4 +1,3 @@
-
 # ======================================================= #
 # LIBRARIES
 # ======================================================= #
@@ -95,7 +94,8 @@ for fast in [False, True]:
 # TEST AXY INTERPOLATION
 # ======================================================= #
 # build a regular interpolation datetime
-interp_freq_secs = [5,10,20,30]
+#interp_freq_secs = [5,10,20,30]
+interp_freq_secs = [2]
 
 for interp in interp_freq_secs:
     
