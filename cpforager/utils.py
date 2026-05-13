@@ -177,7 +177,14 @@ def convert_loc_to_utc(df, local_timezone):
 # ================================================================================================ #
 # APPLY FUNCTION BETWEEN SAMPLES
 # ================================================================================================ #
+<<<<<<< HEAD
 def apply_functions_between_samples(df, resolution, functions_columns, verbose=False):
+=======
+#elif f=="circ_mean": df.loc[idx_1-1,new_column] = circular_mean(df.loc[between_subsamples_points,c])
+#elif f=="circ_sd": df.loc[idx_1-1,new_column] = circular_sd(df.loc[between_subsamples_points,c])
+
+def apply_functions_between_samples(df, resolution, columns_functions, verbose=False):
+>>>>>>> df83170 (Modification utils)
     
     """
     Apply a chosen function (*e.g.* sum, mean, min, max) over every high resolution elements between two subsamples defined by a given resolution.
@@ -248,7 +255,6 @@ def apply_functions_between_samples(df, resolution, functions_columns, verbose=F
             
             # loop over columns to be processed (sum, mean, min or max) between samples
             if len(between_subsamples_points) > 0:
-
                 for f, cs in functions_columns.items():
                     for c in cs:
                         new_column = "%s_%s" % (c, f)
